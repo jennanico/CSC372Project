@@ -59,7 +59,7 @@ def likelihood_random(amount_items, max_weight, output_file, method):
             
             random_weights.append(random_weight)
 
-        numpy.savetxt(output_file, random_weights, fmt='%d')
+        numpy.savetxt(output_file, random_weights, fmt='%d')    # Write to file
     
     else:   # Method likelihood_average
 
@@ -74,11 +74,11 @@ def likelihood_random(amount_items, max_weight, output_file, method):
         for i in range(0, amount_items):
             selection = random.choices(ranges, weights=weights, k=1)    # Determine range to select from,
             if selection == [1]:                                        # then generate from range
-                random_weight = numpy.random.randint(1, mean_range[0]-1)
+                random_weight = numpy.random.randint(1, mean_range[0])
             elif selection == [2]:
                 random_weight = numpy.random.randint(mean_range[0], mean_range[1]+1)
             else:
-                random_weight = numpy.random.randint(mean_range[1]+1, max_weight)
+                random_weight = numpy.random.randint(mean_range[1]+1, max_weight+1)
 
             random_weights.append(random_weight)
 
