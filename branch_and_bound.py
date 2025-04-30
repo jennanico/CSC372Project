@@ -9,10 +9,10 @@ Usage:
 
 '''
 import sys
-from copy import copy
+import copy
 from bisect import insort
 import math
-import greedy.py 
+from greedy import (compute_greedy)
 
 class BinPackSolver():
     def __init__(self, weight_limit: int, items: list):
@@ -26,22 +26,13 @@ class BinPackSolver():
     
     def find_solution(self):
         PQ: list[BinPackTN] = [self.get_root()]
-        # this might not work since PQ[0] is not a complete solution
-        best_node = BinPackTN(PQ[0].bins.copy(),PQ[0].item_to_add,PQ[0].bound,PQ[0].bound,self)
+        best_node = BinPackTN(PQ[0].bins,PQ[0].item_to_add,PQ[0].bound,PQ[0].bound,self)
 
         while PQ != []:
             most_promising = PQ.pop()
             for child in most_promising.get_children():
                 if child.has_better_value(best_node):
-                    cp_bins = child.bins.copy()
-                    cp_item_to_add = child.item_to_add
-                    cp_bins_used = child.bins_used
-                    cp_bound = child.bound
-                    best_node = BinPackTN(cp_bins,
-                                          cp_item_to_add,
-                                          cp_bins_used,
-                                          cp_bound,
-                                          child.solver)
+                    best_node = child
                 if child.might_be_better_than(best_node):
                     insort(PQ, child)
         return best_node
@@ -60,11 +51,12 @@ class BinPackTN():
         self.solver = solver
     
     def compute_bound(self):
+        new_bins = copy.deepcopy(self.bins)
         num_bins = 0
-        bin_array = []
-        num_bins, bin_array = compute_greedy(self.bins, self.item_to_add, self.solver.items, self.solver.weight_limit):
-        ##greedyly fill remaining bins and return final number of bins
-        return math.ceil(num_bins / 1.5)
+        bin_array = [[]]
+        num_bins, bin_array = compute_greedy(new_bins, self.item_to_add, self.solver.items, self.solver.weight_limit)
+        #print(math.floor(num_bins / 1.5))
+        return math.floor(num_bins / 1.5)
     
     def might_be_better_than(self, other):
         return self.bound <= other.bins_used
@@ -82,8 +74,8 @@ class BinPackTN():
         children = []
         for bin in range(len(self.bins)):
             ##if item fits add to bin - stops us from creating invalid nodes
-            if (self.solver.item[self.item_to_add]) + self.bin_capasity(bin) <= self.solver.weight_limit:
-                new_bins = self.bins.copy()
+            if (self.solver.items[self.item_to_add]) + self.bin_capasity(bin) <= self.solver.weight_limit:
+                new_bins = copy.deepcopy(self.bins)
                 new_bins[bin].append(self.item_to_add)
                 child = BinPackTN(new_bins,
                                   self.item_to_add + 1,
@@ -92,7 +84,7 @@ class BinPackTN():
                                   self.solver)
                 child.bound = child.compute_bound()
                 children.append(child)
-        new_bins = self.bins.copy()
+        new_bins = copy.deepcopy(self.bins)
         new_bins.append([])
         new_bins[len(self.bins)].append(self.item_to_add)
         child = BinPackTN(new_bins,
@@ -112,7 +104,7 @@ class BinPackTN():
 
 def main():
     input_values = sys.argv[1]
-    weight_limit = sys.argv[2]
+    weight_limit = int(sys.argv[2])
     file_input = open(input_values,'r')
     with open(input_values, 'r') as file:
         items = [int(line.strip()) for line in file]
