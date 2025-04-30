@@ -84,6 +84,9 @@ class BinPackTN():
                                   self.solver)
                 child.bound = child.compute_bound()
                 children.append(child)
+        '''
+        final creation of new_bins is to account for the case when item will be added to a newly created bin instead of an existing bin
+        '''
         new_bins = copy.deepcopy(self.bins)
         new_bins.append([])
         new_bins[len(self.bins)].append(self.item_to_add)
