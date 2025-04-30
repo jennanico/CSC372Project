@@ -1,7 +1,18 @@
+'''
+Branch and bound algorithm for bin packing
+
+Usage:
+    branch_and_bound.py [item_input_file] int_weight_limit
+
+    Example usage:
+        python generate_random_instance.py 20 50 output.txt likelihood_average
+
+'''
 import sys
 from copy import copy
 from bisect import insort
 import math
+import greedy.py 
 
 class BinPackSolver():
     def __init__(self, weight_limit: int, items: list):
@@ -13,10 +24,10 @@ class BinPackSolver():
         bins = [[0]]
         return BinPackTN(bins,1,1,len(self.items),self)
     
-    ##updated
     def find_solution(self):
         PQ: list[BinPackTN] = [self.get_root()]
-        best_node = PQ[0]
+        # this might not work since PQ[0] is not a complete solution
+        best_node = BinPackTN(PQ[0].bins.copy(),PQ[0].item_to_add,PQ[0].bound,PQ[0].bound,self)
 
         while PQ != []:
             most_promising = PQ.pop()
@@ -47,26 +58,24 @@ class BinPackTN():
         self.bins_used = bins_used
         self.bound = bound
         self.solver = solver
-    ##
+    
     def compute_bound(self):
-        bins = 0
+        num_bins = 0
+        bin_array = []
+        num_bins, bin_array = compute_greedy(self.bins, self.item_to_add, self.solver.items, self.solver.weight_limit):
         ##greedyly fill remaining bins and return final number of bins
-        return math.ceil(bins / 1.5)
+        return math.ceil(num_bins / 1.5)
     
-    ## updated
     def might_be_better_than(self, other):
-        return self.bound >= other.bins_used
+        return self.bound <= other.bins_used
     
-    ## updated
     def has_better_value(self, other):
-        return (self.bound <= other.bound and 
+        return (self.bins_used <= other.bins_used and 
                 self.item_to_add == len(self.solver.items))
     
-    ## updated
     def __lt__(self, other):
         return self.might_be_better_than(other)
     
-    ## updated
     def get_children(self):
         if self.item_to_add == len(self.solver.items):
             return []
@@ -95,21 +104,20 @@ class BinPackTN():
         children.append(child)
         return children
     
-    ##might not need this - just depends on how we want to represent the bins
     def bin_capasity(self, bin):
         total_weight = 0
         for item in self.bins[bin]:
             total_weight = total_weight + self.solver.items[item]
         return total_weight
-##
+
 def main():
     input_values = sys.argv[1]
+    weight_limit = sys.argv[2]
     file_input = open(input_values,'r')
     with open(input_values, 'r') as file:
-        input_lines = file.readlines()
-    weight_limit = input_lines[0]
-    items = input_lines[2:]
+        items = [int(line.strip()) for line in file]
     file_input.close()
+    items.sort(reverse=True)
     BinPack = BinPackSolver(weight_limit, items)
     best_sol = BinPack.find_solution()
 
