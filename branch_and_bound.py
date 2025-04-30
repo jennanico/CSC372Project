@@ -5,7 +5,7 @@ Usage:
     branch_and_bound.py [item_input_file] int_weight_limit
 
     Example usage:
-        python generate_random_instance.py 20 50 output.txt likelihood_average
+        python branch_and_bound.py dummy_input.txt 50
 
 '''
 import sys
