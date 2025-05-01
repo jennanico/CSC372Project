@@ -30,16 +30,22 @@ Takes a file and returns the item list
 '''
 def read_file(file_name):
     file = open(file_name, "r")
-    items = file.readlines()
+    lines = file.readlines()
     file.close()
+
+    items = []
+    for line in lines:
+        items.append(int(line))
+    
     return items
 
 
 def main():
     #items = [20, 30, 34, 9, 3, 4, 34, 10, 39, 40] 
 
-    weight_limit = int(sys.argv[1])
-    items = read_file(sys.argv[2])
+    items = read_file(sys.argv[1])
+    weight_limit = int(sys.argv[2])
+    
     bins = [[]]
     
     items.sort(reverse=True)
