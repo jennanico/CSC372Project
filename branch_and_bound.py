@@ -26,8 +26,11 @@ class BinPackSolver():
     
     def find_solution(self):
         PQ: list[BinPackTN] = [self.get_root()]
-        best_node = BinPackTN(PQ[0].bins,PQ[0].item_to_add,PQ[0].bound,PQ[0].bound,self)
-
+        worst_arrangement = [[]]
+        for i in range(len(PQ[0].solver.items)):
+            worst_arrangement[0].append(i)
+        best_node = BinPackTN(worst_arrangement,len(PQ[0].solver.items),PQ[0].bound,PQ[0].bound,self)
+        
         while PQ != []:
             most_promising = PQ.pop()
             for child in most_promising.get_children():
@@ -55,11 +58,11 @@ class BinPackTN():
         num_bins = 0
         bin_array = [[]]
         num_bins, bin_array = compute_greedy(new_bins, self.item_to_add, self.solver.items, self.solver.weight_limit)
-        #print(math.floor(num_bins / 1.5))
         return math.floor(num_bins / 1.5)
     
     def might_be_better_than(self, other):
-        return self.bound <= other.bins_used
+        #ask about this
+        return self.bound < other.bins_used
     
     def has_better_value(self, other):
         return (self.bins_used <= other.bins_used and 
