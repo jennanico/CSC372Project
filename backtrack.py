@@ -2,10 +2,10 @@
 Branch and bound algorithm for bin packing
 
 Usage:
-    branch_and_bound.py [item_input_file] int_weight_limit
+    backtrack.py [item_input_file] int_weight_limit
 
     Example usage:
-        python branch_and_bound.py dummy_input.txt 50
+        python backtrack.py dummy_input.txt 50
 
 '''
 import sys
